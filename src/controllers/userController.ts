@@ -74,7 +74,9 @@ class UserController {
       user.token = token;
       await user.save();
 
-      return res.status(200).json({ token, message: "Login successful" });
+      return res
+        .status(200)
+        .json({ token, userId: user._id, message: "Login successful" });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error" });
     }
