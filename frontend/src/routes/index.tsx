@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "../Homepage";
-import LoginForm from "../components/LoginForm/LoginForm";
-import RegistrationForm from "../components/RegistrationForm/RegistrationForm";
+import { LoginForm, RegistrationForm } from "../components";
 
 const AppRouter = () => {
   return (
