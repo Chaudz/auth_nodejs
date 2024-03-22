@@ -53,7 +53,6 @@ function FormLogin() {
         navigate("/");
       }
     } catch (error) {
-      console.log(error);
       if (
         typeof error === "object" &&
         error !== null &&
@@ -67,7 +66,7 @@ function FormLogin() {
       ) {
         alert(`Error: ${error.response.data.message}`);
       } else {
-        console.log("Error");
+        alert(`unknown error. Please try agian!!`);
       }
     }
   };
