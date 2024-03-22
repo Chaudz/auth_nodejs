@@ -1,46 +1,19 @@
-import { useForm, SubmitHandler, Path, UseFormRegister } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { ILoginFormValues } from "../../types";
+import Input from "../Input/Input";
 
-interface IFormValues {
-  userName: string;
-  pass: string;
-}
-
-type InputProps = {
-  label: Path<IFormValues>;
-  register: UseFormRegister<IFormValues>;
-  required: boolean;
-};
-
-const Input = ({ label, register, required }: InputProps) => (
-  <>
-    <div
-      style={{
-        display: "flex",
-        flexFlow: "column",
-        alignItems: "start",
-      }}
-    >
-      <label>{label}</label>
-      <input
-        style={{ padding: 7, borderRadius: 5, border: "1px solid #ccc" }}
-        {...register(label, { required })}
-      />
-    </div>
-  </>
-);
-
-function FormLogin() {
+function LoginForm() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<IFormValues>();
+  } = useForm<ILoginFormValues>();
   const navigate = useNavigate();
 
-  const onSubmit: SubmitHandler<IFormValues> = async (data) => {
+  const onSubmit: SubmitHandler<ILoginFormValues> = async (data) => {
     try {
       const response = await axios.post("http://127.0.0.1:3000/v1/login", {
         userName: data.userName,
@@ -99,7 +72,11 @@ function FormLogin() {
               alignItems: "start",
             }}
           >
-            <Input label="userName" register={register} required />
+            <Input<ILoginFormValues>
+              label="userName"
+              register={register}
+              required
+            />
             {errors.userName && (
               <span style={{ color: "red" }}>This field is required</span>
             )}
@@ -112,7 +89,11 @@ function FormLogin() {
               alignItems: "start",
             }}
           >
-            <Input label="pass" register={register} required />
+            <Input<ILoginFormValues>
+              label="pass"
+              register={register}
+              required
+            />
             {errors.pass && (
               <span style={{ color: "red" }}>This field is required</span>
             )}
@@ -134,4 +115,4 @@ function FormLogin() {
   );
 }
 
-export default FormLogin;
+export default LoginForm;

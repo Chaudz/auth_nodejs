@@ -41,7 +41,7 @@ class UserController {
                 });
                 newUser.save();
                 return res
-                    .status(200)
+                    .status(201)
                     .json({ message: "User registered successfully", user: newUser });
             }
             catch (error) {

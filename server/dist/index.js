@@ -28,12 +28,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv = __importStar(require("dotenv"));
+const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const connect_1 = __importDefault(require("./dbConfig/connect"));
 const routes_1 = __importDefault(require("./routes"));
 const app = (0, express_1.default)();
 dotenv.config();
 (0, connect_1.default)();
+app.use((0, cors_1.default)());
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(`/${process.env.VERSION_API}`, routes_1.default);
