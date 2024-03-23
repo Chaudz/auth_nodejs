@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import User, { UserType } from "../models/User";
-import UserNameValidator from "../helper/valid";
+import { UserNameValidator, renderResponse } from "../helpers/index";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -14,17 +14,16 @@ class UserController {
     try {
       const { userName, password, firstName, lastName }: UserType = req.body;
 
-      if (!UserNameValidator.validateUserName(userName)) {
-        return res.status(400).json({ message: "Invalid userName format" });
-      }
-
-      if (!UserNameValidator.validatePassword(password)) {
-        return res.status(400).json({ message: "Invalid password format" });
+      if (
+        !UserNameValidator.validatePassword(password) ||
+        !UserNameValidator.validateUserName(userName)
+      ) {
+        return renderResponse(res, 400, "Invalid userName or password format");
       }
 
       const existingUser = await User.findOne({ userName });
       if (existingUser) {
-        return res.status(400).json({ message: "user already exists" });
+        return renderResponse(res, 400, "user already exists");
       }
 
       const hashedPass = await bcrypt.hash(
@@ -38,14 +37,11 @@ class UserController {
         firstName: firstName || "",
         lastName: lastName || "",
       });
-
       newUser.save();
 
-      return res
-        .status(201)
-        .json({ message: "User registered successfully", user: newUser });
+      return renderResponse(res, 201, "User registered successfully", newUser);
     } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
+      return renderResponse(res, 500, "Internal Server Error");
     }
   }
 
@@ -57,12 +53,12 @@ class UserController {
       });
 
       if (!user) {
-        return res.status(404).json({ message: "user not found" });
+        return renderResponse(res, 404, "User not found");
       }
 
       const matchPass = await bcrypt.compare(password, user.password);
       if (!matchPass) {
-        return res.status(401).json({ message: "Incorrect password" });
+        return renderResponse(res, 401, "Incorrect password");
       }
 
       const payload: IPayload = {
@@ -72,15 +68,15 @@ class UserController {
       const token = jwt.sign(payload, `${process.env.AUTH_JWT}`, {
         expiresIn: `${process.env.EXPIRESIN}`,
       });
-      console.log(token);
       user.token = token;
       await user.save();
 
-      return res
-        .status(200)
-        .json({ token, userId: user._id, message: "Login successful" });
+      return renderResponse(res, 200, "Login successful", {
+        token,
+        userId: user._id,
+      });
     } catch (error) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      return renderResponse(res, 500, "Internal Server Error");
     }
   }
 
@@ -88,9 +84,7 @@ class UserController {
     try {
       const tokenString = req.headers.authorization;
       if (!tokenString) {
-        return res
-          .status(401)
-          .json({ message: "Unauthorized: No token provided" });
+        return renderResponse(res, 401, "Unauthorized: No token provided");
       }
 
       const verifyObj = jwt.verify(
@@ -98,24 +92,24 @@ class UserController {
         `${process.env.AUTH_JWT}`
       ) as IPayload;
       if (!verifyObj) {
-        return res.status(401).json({ message: "Unauthorized: Invalid token" });
+        return renderResponse(res, 401, "Unauthorized: Invalid token");
       }
 
       const user = await User.findById(verifyObj.userId);
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return renderResponse(res, 404, "User not found");
       }
 
       if (user.token !== tokenString) {
-        return res.status(401).json({ message: "Unauthorized: Invalid token" });
+        return renderResponse(res, 401, "Unauthorized: Invalid token");
       }
 
       user.token = "";
       await user.save();
 
-      res.status(200).json({ message: "Logout successful" });
+      return renderResponse(res, 200, "Logout successful");
     } catch (error) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      return renderResponse(res, 500, "Internal Server Error");
     }
   }
 }
