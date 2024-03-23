@@ -21,7 +21,7 @@ class UserController {
         return renderResponse(res, 400, "Invalid userName or password format");
       }
 
-      const existingUser = await User.findOne({ userName });
+      const existingUser = await User.exists({ userName });
       if (existingUser) {
         return renderResponse(res, 400, "user already exists");
       }
