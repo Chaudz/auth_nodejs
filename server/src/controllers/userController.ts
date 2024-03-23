@@ -28,7 +28,10 @@ class UserController {
         return res.status(400).json({ message: "user already exists" });
       }
 
-      const hashedPass = await bcrypt.hash(password, 10);
+      const hashedPass = await bcrypt.hash(
+        password,
+        `${process.env.SALT_BCRYPT}`
+      );
 
       const newUser = new User({
         userName,
