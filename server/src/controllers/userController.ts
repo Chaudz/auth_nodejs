@@ -13,7 +13,6 @@ class UserController {
   async register(req: Request, res: Response) {
     try {
       const { userName, password, firstName, lastName }: UserType = req.body;
-      console.log(userName, password);
 
       if (!UserNameValidator.validateUserName(userName)) {
         return res.status(400).json({ message: "Invalid userName format" });
@@ -71,7 +70,7 @@ class UserController {
         userName,
       };
       const token = jwt.sign(payload, `${process.env.AUTH_JWT}`, {
-        expiresIn: "1h",
+        expiresIn: `${process.env.EXPIRESIN}`,
       });
       console.log(token);
       user.token = token;
