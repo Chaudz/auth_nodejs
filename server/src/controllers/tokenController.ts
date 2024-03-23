@@ -27,7 +27,7 @@ class TokenController {
           const accessToken = jwt.sign(
             { userId: data.userId, userName: data.userName },
             `${process.env.ACCESS_TOKEN_SECRET}`,
-            { expiresIn: "30s" }
+            { expiresIn: "15s" }
           );
           const newRefreshToken = jwt.sign(
             { userId: data.userId },
