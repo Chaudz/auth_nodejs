@@ -3,6 +3,6 @@ import tokenController from "../controllers/tokenController";
 
 const router = Router();
 
-router.post("/refeshToken", tokenController.refreshToken);
+router.post("/refreshToken", tokenController.refreshToken);
 
 export default router;

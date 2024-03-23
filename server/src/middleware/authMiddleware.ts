@@ -11,7 +11,7 @@ export const authToken = async (
     const tokenString: string | undefined = req.headers.authorization;
 
     if (!tokenString) {
-      return renderResponse(res, 401, "Unauthorized");
+      return renderResponse(res, 401, "Token is required");
     }
 
     jwt.verify(tokenString, `${process.env.ACCESS_TOKEN_SECRET}`, (err, _) => {
