@@ -1,4 +1,4 @@
-class UserNameValidator {
+class UserValidator {
   validateUserName(userName: string): boolean {
     if (userName.length < 3 || userName.length > 20) {
       return false;
@@ -30,4 +30,4 @@ class UserNameValidator {
   }
 }
 
-export default new UserNameValidator();
+export default new UserValidator();

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { renderResponse } from "../helpers/index";
 import jwt from "jsonwebtoken";
 
-export const isAdmin = async (
+export const authToken = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -14,23 +14,10 @@ export const isAdmin = async (
       return renderResponse(res, 401, "Unauthorized");
     }
 
-    let verifyObj: any;
-
-    try {
-      verifyObj = jwt.verify(tokenString, `${process.env.AUTH_JWT}`);
-    } catch (error) {
-      return renderResponse(res, 401, "Invalid token");
-    }
-
-    if (!verifyObj) {
-      return renderResponse(res, 401, "Unauthorized");
-    }
-
-    if (verifyObj?.userName === "admin") {
+    jwt.verify(tokenString, `${process.env.ACCESS_TOKEN_SECRET}`, (err, _) => {
+      if (err) return renderResponse(res, 403, "Unauthorized ");
       next();
-    } else {
-      return renderResponse(res, 403, "Not an admin account");
-    }
+    });
   } catch (error) {
     return renderResponse(res, 500, "Internal server error");
   }

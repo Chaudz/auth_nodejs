@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import User, { UserType } from "../models/User";
-import { UserNameValidator, renderResponse } from "../helpers/index";
+import { UserValidator, renderResponse } from "../helpers/index";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import Token from "../models/Token";
+import TokenTypes from "../enums/tokenType.enum";
 
-interface IPayload {
+export interface IPayload {
   userId: string;
   userName: string;
 }
@@ -15,8 +17,8 @@ class UserController {
       const { userName, password, firstName, lastName }: UserType = req.body;
 
       if (
-        !UserNameValidator.validatePassword(password) ||
-        !UserNameValidator.validateUserName(userName)
+        !UserValidator.validatePassword(password) ||
+        !UserValidator.validateUserName(userName)
       ) {
         return renderResponse(res, 400, "Invalid userName or password format");
       }
@@ -26,16 +28,16 @@ class UserController {
         return renderResponse(res, 400, "user already exists");
       }
 
-      const hashedPass = await bcrypt.hash(
+      const hashedPassword = await bcrypt.hash(
         password,
-        `${process.env.SALT_BCRYPT}`
+        Number.parseInt(process.env.SALT_BCRYPT as string)
       );
 
       const newUser = new User({
         userName,
-        pass: hashedPass,
-        firstName: firstName || "",
-        lastName: lastName || "",
+        password: hashedPassword,
+        firstName: firstName,
+        lastName: lastName,
       });
       newUser.save();
 
@@ -65,14 +67,33 @@ class UserController {
         userId: user._id.toString(),
         userName,
       };
-      const token = jwt.sign(payload, `${process.env.AUTH_JWT}`, {
-        expiresIn: `${process.env.EXPIRESIN}`,
+
+      const accessToken = jwt.sign(
+        payload,
+        `${process.env.ACCESS_TOKEN_SECRET}`,
+        {
+          expiresIn: "15s",
+        }
+      );
+
+      const refeshToken = jwt.sign(
+        payload,
+        `${process.env.REFRESH_TOKEN_SECRET}`,
+        {
+          expiresIn: "30d",
+        }
+      );
+
+      const token = new Token({
+        tokenType: TokenTypes.Refresh,
+        tokenValue: refeshToken,
+        userId: payload.userId,
       });
-      user.token = token;
-      await user.save();
+      await token.save();
 
       return renderResponse(res, 200, "Login successful", {
-        token,
+        accessToken,
+        refeshToken,
         userId: user._id,
       });
     } catch (error) {
@@ -82,30 +103,20 @@ class UserController {
 
   async logout(req: Request, res: Response) {
     try {
-      const tokenString = req.headers.authorization;
-      if (!tokenString) {
+      const refreshToken = req.headers.authorization;
+      if (!refreshToken) {
         return renderResponse(res, 401, "Unauthorized: No token provided");
       }
 
       const verifyObj = jwt.verify(
-        tokenString,
-        `${process.env.AUTH_JWT}`
+        refreshToken,
+        `${process.env.REFRESH_TOKEN_SECRET}`
       ) as IPayload;
       if (!verifyObj) {
         return renderResponse(res, 401, "Unauthorized: Invalid token");
       }
 
-      const user = await User.findById(verifyObj.userId);
-      if (!user) {
-        return renderResponse(res, 404, "User not found");
-      }
-
-      if (user.token !== tokenString) {
-        return renderResponse(res, 401, "Unauthorized: Invalid token");
-      }
-
-      user.token = "";
-      await user.save();
+      await Token.findOneAndDelete({ tokenValue: refreshToken });
 
       return renderResponse(res, 200, "Logout successful");
     } catch (error) {

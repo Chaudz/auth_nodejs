@@ -1,2 +1,2 @@
-export { default as UserNameValidator } from "./valid";
+export { default as UserValidator } from "./valid";
 export { default as renderResponse } from "./responseHelper";
