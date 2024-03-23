@@ -12,14 +12,14 @@ interface IPayload {
 class UserController {
   async register(req: Request, res: Response) {
     try {
-      const { userName, pass, firstName, lastName }: UserType = req.body;
-      console.log(userName, pass);
+      const { userName, password, firstName, lastName }: UserType = req.body;
+      console.log(userName, password);
 
       if (!UserNameValidator.validateUserName(userName)) {
         return res.status(400).json({ message: "Invalid userName format" });
       }
 
-      if (!UserNameValidator.validatePassword(pass)) {
+      if (!UserNameValidator.validatePassword(password)) {
         return res.status(400).json({ message: "Invalid password format" });
       }
 
@@ -28,7 +28,7 @@ class UserController {
         return res.status(400).json({ message: "user already exists" });
       }
 
-      const hashedPass = await bcrypt.hash(pass, 10);
+      const hashedPass = await bcrypt.hash(password, 10);
 
       const newUser = new User({
         userName,
@@ -49,7 +49,7 @@ class UserController {
 
   async login(req: Request, res: Response) {
     try {
-      const { pass, userName }: UserType = req.body;
+      const { password, userName }: UserType = req.body;
       const user = await User.findOne({
         userName,
       });
@@ -58,7 +58,7 @@ class UserController {
         return res.status(404).json({ message: "user not found" });
       }
 
-      const matchPass = await bcrypt.compare(pass, user.pass);
+      const matchPass = await bcrypt.compare(password, user.password);
       if (!matchPass) {
         return res.status(401).json({ message: "Incorrect password" });
       }

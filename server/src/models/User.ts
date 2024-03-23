@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 export type UserType = {
   userName: string;
-  pass: string;
+  password: string;
   firstName?: string;
   lastName?: string;
   token?: string;
@@ -10,9 +10,9 @@ export type UserType = {
 
 const userSchema = new Schema<UserType>({
   userName: { type: String, required: true, unique: true },
-  pass: { type: String, required: true },
-  firstName: { type: String },
-  lastName: { type: String },
+  password: { type: String, required: true },
+  firstName: { type: String, default: "" },
+  lastName: { type: String, default: "" },
   token: { type: String },
 });
 
