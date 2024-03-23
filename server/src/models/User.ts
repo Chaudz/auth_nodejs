@@ -8,14 +8,16 @@ export type UserType = {
   token?: string;
 };
 
-const useSchema = new Schema<UserType>({
-  userName: { type: String, required: true },
+const userSchema = new Schema<UserType>({
+  userName: { type: String, required: true, unique: true },
   pass: { type: String, required: true },
   firstName: { type: String },
   lastName: { type: String },
   token: { type: String },
 });
 
-const User = model<UserType>("users", useSchema);
+userSchema.index({ userName: 1 });
+
+const User = model<UserType>("users", userSchema);
 
 export default User;
