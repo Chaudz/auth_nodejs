@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { isAdmin } from "../middleware/auth";
+import { isAdmin } from "../middleware/authMiddleware";
 
 const router = Router();
 
