@@ -22,7 +22,6 @@ function LoginForm() {
           password: data.password,
         }
       );
-      console.log(response);
       if (response.status === 200) {
         Cookies.set("userId", response.data.data.userId);
         Cookies.set("accessToken", response.data.data.accessToken);

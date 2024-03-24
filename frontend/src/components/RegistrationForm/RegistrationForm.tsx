@@ -22,9 +22,6 @@ const RegistrationForm = () => {
           lastName: data.lastName,
         }
       );
-
-      console.log(response);
-
       if (response.status === 201) {
         alert(response.data.message);
       }
