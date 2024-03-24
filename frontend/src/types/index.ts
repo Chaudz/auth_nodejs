@@ -1,10 +1,10 @@
 export interface ILoginFormValues {
   userName: string;
-  pass: string;
+  password: string;
 }
 export interface IRegisterFormValues {
   userName: string;
-  pass: string;
+  password: string;
   firstName: string;
   lastName: string;
 }

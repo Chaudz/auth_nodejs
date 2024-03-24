@@ -15,14 +15,18 @@ function LoginForm() {
 
   const onSubmit: SubmitHandler<ILoginFormValues> = async (data) => {
     try {
-      const response = await axios.post("http://127.0.0.1:3000/v1/login", {
-        userName: data.userName,
-        pass: data.pass,
-      });
-
+      const response = await axios.post(
+        "http://127.0.0.1:3000/api/v1/auth/login",
+        {
+          userName: data.userName,
+          password: data.password,
+        }
+      );
+      console.log(response);
       if (response.status === 200) {
-        Cookies.set("userId", response.data.userId);
-        Cookies.set("token", response.data.token);
+        Cookies.set("userId", response.data.data.userId);
+        Cookies.set("accessToken", response.data.data.accessToken);
+        Cookies.set("refeshToken", response.data.data.refeshToken);
         navigate("/");
       }
     } catch (error) {
@@ -90,11 +94,11 @@ function LoginForm() {
             }}
           >
             <Input<ILoginFormValues>
-              label="pass"
+              label="password"
               register={register}
               required
             />
-            {errors.pass && (
+            {errors.password && (
               <span style={{ color: "red" }}>This field is required</span>
             )}
           </div>

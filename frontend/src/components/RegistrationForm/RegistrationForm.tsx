@@ -13,13 +13,17 @@ const RegistrationForm = () => {
 
   const onSubmit: SubmitHandler<IRegisterFormValues> = async (data) => {
     try {
-      console.log("fdsaf");
-      const response = await axios.post("http://127.0.0.1:3000/v1/register", {
-        userName: data.userName,
-        pass: data.pass,
-        firstName: data.firstName,
-        lastName: data.lastName,
-      });
+      const response = await axios.post(
+        "http://127.0.0.1:3000/api/v1/auth/register",
+        {
+          userName: data.userName,
+          password: data.password,
+          firstName: data.firstName,
+          lastName: data.lastName,
+        }
+      );
+
+      console.log(response);
 
       if (response.status === 201) {
         alert(response.data.message);
@@ -89,11 +93,11 @@ const RegistrationForm = () => {
             }}
           >
             <Input<IRegisterFormValues>
-              label="pass"
+              label="password"
               required
               register={register}
             />
-            {errors.pass && (
+            {errors.password && (
               <span style={{ color: "red" }}>This field is required</span>
             )}
           </div>
